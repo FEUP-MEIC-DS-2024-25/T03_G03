@@ -4,6 +4,15 @@ import { Button } from "@/components/ui/button"
 
 import { Mic } from "lucide-react"
 
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+  } from "@/components/ui/dialog"
+
 export default function LandingPage(){
 
     return(
@@ -14,19 +23,32 @@ export default function LandingPage(){
                 <div className="relative">
                     <Textarea placeholder="Type your message here." />
                     <div className="absolute bottom-2 right-2 flex space-x-2">
-                        <Button
-                            type="button"
-                            size="sm"
-                            onClick={() => console.log("Fodasi")}
-                            className="rounded-full text-xs"
-                        >
-                            <span className="p-2 hover:bg-black hover:text-white rounded-full">
-                                <Mic size={16}/>
-                            </span>
-                        </Button>
+                        <Dialog>
+                        <DialogTrigger>
+                            <Button
+                                type="button"
+                                size="sm"
+                                onClick={() => console.log("Fodasi")}
+                                className="rounded-full text-xs"
+                            >
+                                <span className="p-2 hover:bg-black hover:text-white rounded-full">
+                                    <Mic size={16}/>
+                                </span>
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                            <DialogHeader>
+                            <DialogTitle>Are you absolutely sure?</DialogTitle>
+                            <DialogDescription>
+                                This action cannot be undone. This will permanently delete your account
+                                and remove your data from our servers.
+                            </DialogDescription>
+                            </DialogHeader>
+                        </DialogContent>
+                        </Dialog>
                     </div>  
                 </div>
-                <span className="w-full text-center bg-black text-white hover:bg-red-500">
+                <span className="w-full text-center bg-black text-white hover:bg-gray-400 hover:text-black">
                     <Button>Send message</Button>
                 </span>
             </div>
