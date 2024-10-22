@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const axios = require('axios');
 const path = require('path');
-require('dotenv').config({ path: path.resolve(__dirname, '../../..', '.env') });
+require('dotenv').config({ path: path.resolve(__dirname, '../../../', '.env') });
 
 
 const API_KEY = process.env.GEMINI_API_KEY;
@@ -10,6 +10,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 exports.sendPrompt = async (prompt) => {
   console.log('Sending prompt to Gemini API...');
+  console.log("Api key: ", API_KEY);
     try {
         const result = await model.generateContent(prompt);
         console.log('Received response from Gemini API:', result.response.text());
