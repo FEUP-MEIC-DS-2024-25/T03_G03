@@ -1,5 +1,5 @@
 // Extra components
-import { Textarea } from "@/components/ui/textarea";
+import  ExpandingTextarea  from "@/components/ui/expanding-textarea";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Mic } from "lucide-react";
@@ -85,12 +85,14 @@ export default function LandingPage() {
 
             {/* Input Bar */}
             <div className={`relative p-4 ${conversations.length === 0 ? 'flex justify-center flex-col items-center' : ''}`}>
-                <Textarea
-                    placeholder="Type your message here."
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    className="w-full"
-                />
+                <div className="w-full">
+                    <ExpandingTextarea
+                        handleSubmit={handleSubmit}
+                        message={message}
+                        setMessage={setMessage}
+                        placeholder = {"Type a message..."}
+                    />
+                </div>
                 <div className="flex justify-center mt-2">
                     <Dialog>
                         <DialogTrigger>
@@ -115,7 +117,7 @@ export default function LandingPage() {
                     </Dialog>
                     <Button
                         onClick={handleSubmit}
-                        className="ml-2 bg-black text-white hover:bg-gray-400 hover:text-black"
+                        className="ml-2 bg-black text-white dark:text-red-500 hover:bg-gray-400 hover:text-black"
                     >
                         Send message
                     </Button>

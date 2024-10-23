@@ -5,6 +5,9 @@ import VerticalSidePanel from "@/components/VerticalPanel"
 import LandingPage from "@/components/LandingPage"
 import Header from "@/components/Header"
 
+//Contexts 
+import { ThemeProvider } from "@/components/contexts/ThemeContext"
+
 export default function App() {
 
   //Static Mock data 
@@ -13,16 +16,16 @@ export default function App() {
     avatar: "https://picsum.photos/200/300"
   }
 
-    //Vertical Side Bar State
-    const [isCollapsed, setIsCollapsed] = useState(false)
+  //Vertical Side Bar State
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
-    const toggleCollapse = () => {
-      setIsCollapsed(!isCollapsed)
-    }
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed)
+  }
 
   return (
 
-    <>
+    <ThemeProvider>
       <Header user={user} isCollapsed={isCollapsed} toggleCollapse={toggleCollapse}/>
       <section className="flex flex-row items-center w-full min-h-screen bg-white">
         <VerticalSidePanel user={user} isCollapsed={isCollapsed} toggleCollapse={toggleCollapse}/>
@@ -30,6 +33,6 @@ export default function App() {
           <LandingPage />
         </div>
       </section>
-    </>
+    </ThemeProvider>
   )
 }
