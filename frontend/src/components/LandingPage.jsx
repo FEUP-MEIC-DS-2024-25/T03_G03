@@ -1,8 +1,7 @@
-// Extra components
-import  ExpandingTextarea  from "@/components/ui/expanding-textarea";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Mic } from "lucide-react";
+import { useState, useRef } from "react";
+import { Mic, StopCircle } from "lucide-react";
 import {
     Dialog,
     DialogContent,
@@ -15,6 +14,9 @@ import {
 export default function LandingPage() {
     const [message, setMessage] = useState("");
     const [conversations, setConversations] = useState([]);
+    const [isRecording, setIsRecording] = useState(false);
+    const [dialogOpen, setDialogOpen] = useState(false); // New state for dialog open
+    const recognitionRef = useRef(null);
 
     const handleSubmit = async () => {
         try {
@@ -35,10 +37,9 @@ export default function LandingPage() {
             }
 
             const data = await response.json();
-            console.log(data); 
+            console.log(data);
 
             if (data) {
-                // Append new conversation pair (user query and answer)
                 setConversations((prevConversations) => [
                     ...prevConversations,
                     { query: message, answer: data }
@@ -54,6 +55,48 @@ export default function LandingPage() {
             setMessage(""); // Clear the message after sending
         } catch (error) {
             console.error("Error submitting prompt to backend:", error);
+        }
+    };
+
+    // Speech-to-text functionality
+    const startRecording = () => {
+        if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+            alert("Your browser does not support speech recognition.");
+            return;
+        }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
+
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onstart = () => {
+            setIsRecording(true);
+        };
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[event.resultIndex][0].transcript;
+            setMessage((prevMessage) => prevMessage + transcript);
+        };
+
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error:", event.error);
+        };
+
+        recognition.onend = () => {
+            setIsRecording(false);
+        };
+
+        recognition.start(); // Start recording automatically
+    };
+
+    const stopRecording = () => {
+        if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            setIsRecording(false);
+            setDialogOpen(false); // Close the dialog when stopping recording
         }
     };
 
@@ -85,39 +128,51 @@ export default function LandingPage() {
 
             {/* Input Bar */}
             <div className={`relative p-4 ${conversations.length === 0 ? 'flex justify-center flex-col items-center' : ''}`}>
-                <div className="w-full">
-                    <ExpandingTextarea
-                        handleSubmit={handleSubmit}
-                        message={message}
-                        setMessage={setMessage}
-                        placeholder = {"Type a message..."}
-                    />
-                </div>
+                <Textarea
+                    placeholder="Type your message here."
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="w-full"
+                />
                 <div className="flex justify-center mt-2">
-                    <Dialog>
+                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                         <DialogTrigger>
                             <Button
                                 type="button"
                                 size="sm"
                                 className="rounded-full text-xs"
+                                onClick={() => {
+                                    startRecording(); // Start recording when dialog is triggered
+                                    setDialogOpen(true); // Open the dialog
+                                }}
+                                disabled={isRecording}
                             >
-                                <span className="p-2 hover:bg-black hover:text-white rounded-full">
+                                <span className={`p-2 hover:bg-black hover:text-white rounded-full ${isRecording ? 'bg-red-500 text-white' : ''}`}>
                                     <Mic size={16} />
                                 </span>
                             </Button>
                         </DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Text to Speech?</DialogTitle>
+                                <DialogTitle>Speech-to-Text</DialogTitle>
                                 <DialogDescription>
-                                    This feature is not available yet.
+                                    {isRecording ? (
+                                        <Button
+                                            onClick={stopRecording}
+                                            className="bg-red-500 text-white hover:bg-red-600"
+                                        >
+                                            <StopCircle size={16} className="mr-2" />
+                                            Stop Recording
+                                        </Button>
+                                    ) : null}
                                 </DialogDescription>
                             </DialogHeader>
                         </DialogContent>
                     </Dialog>
+
                     <Button
                         onClick={handleSubmit}
-                        className="ml-2 bg-black text-white dark:text-red-500 hover:bg-gray-400 hover:text-black"
+                        className="ml-2 bg-black text-white hover:bg-gray-400 hover:text-black"
                     >
                         Send message
                     </Button>
