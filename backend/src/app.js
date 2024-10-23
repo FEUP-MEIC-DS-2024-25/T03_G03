@@ -1,4 +1,5 @@
 const express = require('express');
+var cors = require('cors')
 const promptRoutes = require('./routes/geminiRoutes');
 
 const path = require('path');
@@ -9,6 +10,8 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+app.use(cors())
+
 
 // Routes
 app.use('/api', promptRoutes);

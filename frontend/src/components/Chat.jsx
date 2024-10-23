@@ -1,5 +1,5 @@
 export default function Chat(){
     return(
-        <p>Fodasi</p>
+        <p>Adoro DS</p>
     )
 }
