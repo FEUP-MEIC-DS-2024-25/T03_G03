@@ -1,7 +1,7 @@
 import React from 'react';
 
 const AnswerBox = ({ answer }) => {
-    if (!answer) return null; // Return null if answer is undefined or empty
+    if (!answer) return null; // Don't render if there's no answer
 
     return (
         <div className="mt-4 p-4 border border-gray-300 rounded-lg bg-gray-50">
