@@ -10,8 +10,12 @@ exports.sendPrompt = async (req, res) => {
             throw new Error('Please provide a prompt.');
         }
 
+        const prePrompt = "Provide a Requirements Engineering list of key points for Software Development for the following project: ";
+
+        const requirementsPrompt = prePrompt + prompt;
+
         // Send the prompt to the Gemini service
-        const result = await promptService.sendPrompt(prompt);
+        const result = await promptService.sendPrompt(requirementsPrompt);
         res.json(result);  // Send the result back as JSON
     } catch (error) {
         res.status(500).json({ message: error.message });
