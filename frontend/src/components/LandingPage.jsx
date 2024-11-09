@@ -16,7 +16,8 @@ export default function LandingPage() {
     const [conversations, setConversations] = useState([]);
     const [isRecording, setIsRecording] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false); // New state for dialog open
-    const recognitionRef = useRef(null);
+    const recognitionRef = useRef(null);    
+    const [language, setLanguage] = useState('en-US'); // Default language
 
     const handleSubmit = async () => {
         try {
@@ -59,6 +60,7 @@ export default function LandingPage() {
     };
 
     // Speech-to-text functionality
+
     const startRecording = () => {
         if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
             alert("Your browser does not support speech recognition.");
@@ -71,6 +73,7 @@ export default function LandingPage() {
 
         recognition.continuous = true;
         recognition.interimResults = false;
+        recognition.lang = language; // Set the recognition language to the selected one
 
         recognition.onstart = () => {
             setIsRecording(true);
@@ -98,6 +101,12 @@ export default function LandingPage() {
             setIsRecording(false);
             setDialogOpen(false); // Close the dialog when stopping recording
         }
+    };
+
+    
+    // Example language selection handler
+    const handleLanguageChange = (event) => {
+        setLanguage(event.target.value);
     };
 
     return (
@@ -135,40 +144,63 @@ export default function LandingPage() {
                     className="w-full"
                 />
                 <div className="flex justify-center mt-2">
-                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                        <DialogTrigger>
-                            <Button
-                                type="button"
-                                size="sm"
-                                className="rounded-full text-xs"
-                                onClick={() => {
-                                    startRecording(); // Start recording when dialog is triggered
-                                    setDialogOpen(true); // Open the dialog
-                                }}
-                                disabled={isRecording}
+                <Dialog 
+                    open={dialogOpen} 
+                    onOpenChange={(open) => {
+                        setDialogOpen(open);
+                        if (!open && isRecording) {
+                            stopRecording(); // Stop recording when the dialog is closed
+                        }
+                    }}
+                >
+                    <DialogTrigger>
+                        <Button
+                            type="button"
+                            size="sm"
+                            className="rounded-full text-xs"
+                            onClick={() => {
+                                startRecording(); // Start recording when dialog is triggered
+                                setDialogOpen(true); // Open the dialog
+                            }}
+                            disabled={isRecording}
+                        >
+                            <span className={`p-2 hover:bg-black hover:text-white rounded-full ${isRecording ? 'bg-red-500 text-white' : ''}`}>
+                                <Mic size={16} />
+                            </span>
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Speech-to-Text</DialogTitle>
+                            <DialogDescription>
+                                {isRecording ? (
+                                    <Button
+                                        onClick={stopRecording}
+                                        className="bg-red-500 text-white hover:bg-red-600"
+                                    >
+                                        <StopCircle size={16} className="mr-2" />
+                                        Stop Recording
+                                    </Button>
+                                ) : null}
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="mt-4">
+                            <label htmlFor="language-select" className="block text-sm font-medium text-gray-700">Select Language</label>
+                            <select
+                                id="language-select"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                onChange={(e) => setLanguage(e.target.value)}
                             >
-                                <span className={`p-2 hover:bg-black hover:text-white rounded-full ${isRecording ? 'bg-red-500 text-white' : ''}`}>
-                                    <Mic size={16} />
-                                </span>
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                            <DialogHeader>
-                                <DialogTitle>Speech-to-Text</DialogTitle>
-                                <DialogDescription>
-                                    {isRecording ? (
-                                        <Button
-                                            onClick={stopRecording}
-                                            className="bg-red-500 text-white hover:bg-red-600"
-                                        >
-                                            <StopCircle size={16} className="mr-2" />
-                                            Stop Recording
-                                        </Button>
-                                    ) : null}
-                                </DialogDescription>
-                            </DialogHeader>
-                        </DialogContent>
-                    </Dialog>
+                                <option value="en-US">English</option>
+                                <option value="es-ES">Spanish</option>
+                                <option value="fr-FR">French</option>
+                                <option value="de-DE">German</option>
+                                <option value="pt-PT">Portuguese</option>
+                                {/* Add more languages as needed */}
+                            </select>
+                        </div>
+                    </DialogContent>
+                </Dialog>
 
                     <Button
                         onClick={handleSubmit}
