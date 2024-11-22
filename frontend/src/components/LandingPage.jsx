@@ -1,7 +1,7 @@
 // Extra components
 import  ExpandingTextarea  from "@/components/ui/expanding-textarea";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Mic } from "lucide-react";
 import {
     Dialog,
@@ -12,9 +12,16 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 
+//Notifications 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function LandingPage() {
     const [message, setMessage] = useState("");
     const [conversations, setConversations] = useState([]);
+    const [disabled, setDisabled] = useState(false);
+    const disableTimerMult = useRef(5); 
+    const disabeTimerCntr = useRef(0); 
 
     const handleSubmit = async () => {
         try {
@@ -30,7 +37,29 @@ export default function LandingPage() {
             });
 
             if (!response.ok) {
-                console.error("Failed to fetch:", response.status);
+
+                if(disabeTimerCntr.current === 3){
+                    toast.error('Error sending prompt to backend. Please try again later.');
+                    setDisabled(true); 
+                } 
+                else{
+                    toast.error('Error sending prompt to backend. Retrying in ' + (disableTimerMult.current) + ' seconds.', {
+                        autoClose: disableTimerMult.current * 1000
+                    });
+
+                    //Set the button to disabled for X seconds
+                    setDisabled(true);
+
+                    //Reenable the button after X seconds
+                    setTimeout(() => {
+                        setDisabled(false);
+                    }
+                    , disableTimerMult.current * 1000);
+
+                    disabeTimerCntr.current += 1;
+                    disableTimerMult.current += 5;
+                }
+                
                 return;
             }
 
@@ -115,12 +144,27 @@ export default function LandingPage() {
                             </DialogHeader>
                         </DialogContent>
                     </Dialog>
+
                     <Button
                         onClick={handleSubmit}
-                        className="ml-2 bg-black text-white dark:text-red-500 hover:bg-gray-400 hover:text-black"
+                        disabled={disabled}
+                        //If it is disabled, change the color to gray
+                        className={`ml-2 bg-black text-white dark:text-white-200 hover:bg-gray-400 hover:text-black ${disabled ? "bg-gray-300" : ""}`}
                     >
                         Send message
                     </Button>
+                    <ToastContainer
+                        position="top-center"
+                        autoClose={5000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                        theme="light"
+                    />
                 </div>
             </div>
         </div>
