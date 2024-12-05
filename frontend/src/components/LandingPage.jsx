@@ -96,7 +96,8 @@ export default function LandingPage() {
                         {conversations.map((conv, index) => (
                             <div key={index} className="p-2 border-b border-gray-300">
                                 <p className="font-bold">You: {conv.query}</p>
-                                <p className="ml-4">Bot: {conv.answer}</p>
+                                <p className="ml-4">Bot:</p>
+                                <ReactMarkdown className="markdown">{conv.answer}</ReactMarkdown>
                             </div>
                         ))}
                     </div>
